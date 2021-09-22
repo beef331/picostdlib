@@ -3,14 +3,14 @@ import picostdlib
 
 stdioInitAll() #is necessary for initializzate usb
 
-const led1 = 25.Gpio; led1.init(); led1.setDir(Out) #enable a led on board try
+#const led1 = 25.Gpio; led1.init(); led1.setDir(Out) #enable a led on board try (old statment)
+setupGpio(led1, 25.Gpio, Out) #new "sugar" style statement
 var charX: char #create a char variable (getCharwithTimeOut return a char!!)
-sleep (600)
+sleep(600)
 
 while true:
   charX = getCharWithTimeOut(300)
-
-  if charX  != '\255' :
+  if charX  != '\255':
     print("Char put -> " & charX & '\n')
     if charX == '1': #turn on led if recive 1 (char)
       led1.put(High)
