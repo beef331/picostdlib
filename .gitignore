@@ -1,8 +1,9 @@
-*
-!*.*
-!*/
-
-nimcache/
-nimblecache/
-htmldocs/
-
+/htmldocs/
+/piconim
+/build/
+/tests/test_mock
+/testproject*/
+/secret.nims
+/src/picostdlib/futharkgen
+/piconim
+/piconim.exe

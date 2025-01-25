@@ -1,80 +1,128 @@
 # Raspberry Pi Pico SDK for Nim
 
-This library provides the library and build system necessary to write programs for RP2040 based devices (such as the Raspberry Pi Pico) in the [Nim](https://nim-lang.org/) programming language
+This library provides the library and build system necessary to write
+programs for RP2040-based devices (such as the Raspberry Pi Pico) in the
+[Nim](https://nim-lang.org/) programming language.
 
-The libary provides wrappers for the original [Raspberry Pi Pico
-SDK](https://github.com/raspberrypi/pico-sdk). The following features are
-currently implemented:
+The libary provides a complete wrapper for the [Raspberry Pi Pico
+SDK](https://github.com/raspberrypi/pico-sdk) v2.1.0. Here are some of the feature highlights:
 
-* Automatic project scaffolding using the `piconim` tool
-* Standard library features such as GPIO, time, ADC, PWM and many more
-* Rudimentary TinyUSB support: USB device, HID and CDC (serial port) classes
+* Project generator and building using the `piconim` tool
+* Setup, build and upload your project using Nimble, automatically runs CMake
+  (use piconim for advanced building)
+* Standard SDK library features such as GPIO, time, ADC, PWM and many more
+* Wrapper for Pico SDK functions but with Nim flavour, with strict types for safety
+* Wireless support for Pico W (Wifi, Bluetooth, HTTPS)
 
+Blink example (works on Pico W too!)
 
-## Table of Contents
+```nim
+import picostdlib
 
-[Setup](##Setup)
+DefaultLedPin.init()
+DefaultLedPin.setDir(Out)
 
-[Building](##Building)
+while true:
+  DefaultLedPin.put(High)
+  sleepMs(250)
+  DefaultLedPin.put(Low)
+  sleepMs(250)
+```
 
-[Examples](examples)
+See the [examples](examples) folder for more examples on how to use the SDK using Nim.
 
-[Contributing](##Contributing)
-
-[License](LICENSE)
 
 ## Setup
 
 **The following steps will install piconim and create a new project**
 
 1. First, you will need to have the Nim compiler installed. If you don't already
-have it, consider using [choosenim](https://github.com/dom96/choosenim)
+have it, consider using [choosenim](https://github.com/dom96/choosenim).
 
 2. Since this is just a wrapper for the original
 [pico-sdk](https://github.com/raspberrypi/pico-sdk), you will need to install the C
 library [dependencies](https://github.com/raspberrypi/pico-sdk#quick-start-your-own-project)
-(Step 1 in the quick start section)
+(Step 1 in the quick start section).
 
-3. From the terminal, run `nimble install https://github.com/EmbeddedNim/picostdlib`.
+3. Some parts of this library uses [Futhark](https://github.com/PMunch/futhark) to
+wrap some C libraries, which depends on libclang.
+See its installation guide [here](https://github.com/PMunch/futhark#installation).
 
-4. Run `piconim init <project-name>` to create a new project directory from a
+4. From the terminal, run `nimble install https://github.com/EmbeddedNim/picostdlib`.
+
+5. Run `piconim init <project-name>` to create a new project directory from a
 template. This will create a new folder, so make sure you are in the parent folder.
+When it asks for what project type, choose `>binary<` or `>hybrid<`. If you choose
+`>library<` there will be nothing to build.
 You can also provide the following options to the subcommand:
     - (--sdk, -s) -> specify the path to a locally installed `pico-sdk` repository,
-    ex.  `--sdk:/home/casey/pico-sdk`
+      ex.  `--sdk:/home/user/pico-sdk`.
+    - (--board, -b) -> specify the board type (`pico` or `pico_w` are accepted),
+      choosing pico_w includes a pico_w blink example
     - (--overwrite, -O) -> a flag to specify overwriting an exisiting directory
-    with the `<project-name>` already created. Be careful with this.
-    ex. `piconim myProject --overwrite` will replace a folder named `myProject`
+      with the `<project-name>` already created. Be careful with this.
+      ex. `piconim myProject --overwrite` will replace a folder named `myProject`
+
+6. Change directory to the new project and run `nimble configure`. This will initialize
+the Pico SDK using CMake. If you provided a path to the SDK in the previous step, it will
+use that, otherwise it will download the SDK from GitHub, or if you have the Pico SDK installed
+already, it will use environment variable `PICO_SDK_PATH`.
+
+You are now ready to start developing and building your project.
+
 
 ## Building
 
-Now you can work on your project. When you are ready to build the `.uf2` file
-(which will be copied to the Raspberry Pi Pico), you can use the `build` subcommand:
+When you are ready to build the `.uf2` file (which will be copied to the Raspberry Pi Pico),
+you can use the `build` command of Nimble:
 
-`piconim build <main-program>`
+`nimble build`
 
-Where `<main-program>` is the main module in your `src` folder. (ex. `piconim
-build myProject` if the main nim file is `myProject.nim`). You can also specify
-an output directory, otherwise it will be placed in `csource/build`
+The generated `.uf2` file is placed in `build/<project>/<program>.uf2`
 
-### `piconim setup`
+Modify `CMakeLists.txt` to suit your project's needs.
 
-If a piconim project is cloned fresh, or if `git clean` is ran, then the `csource/build`
-directory will need to be re-generated by CMake. This can be accomplished with the
-`piconim setup` command. The `setup` command takes an optional `--sdk` argument that works
-exactly like for the `init` command, described above.
-
-Examples:
+## Usage
 
 ```bash
-# Run these commands from the project root.
+# Initialize a new project
+piconim init [--sdk <sdk-path>] [--board <pico-board>] [--overwrite] <project-name>
 
-# Re-run CMake, download Pico SDK from Github
-piconim setup
+# Run the following commands from the project root.
+# If you don't specify a program name, it will use all
+# binaries specified in your Nimble file. You can specify multiple.
 
-# Re-run CMake, use existing SDK
-piconim setup --sdk:/home/casey/pico-sdk
+# Run CMake configure, download Pico SDK from Github (if needed)
+nimble configure [program]
+
+# Builds C/C++ files with Nim, runs CMake build/make
+nimble build [program]
+
+# Run the CMake clean target, and cleans nimcache
+nimble fastclean [program]
+
+# Clean build directories, and cleans nimcache
+nimble distclean [program]
+
+# Runs clean and then builds.
+nimble buildclean [program]
+
+# Upload using picotool (installed separately)
+# Pass --build to run build task first. Add --clean to clean before building.
+nimble upload [program] [--build] [--clean]
+
+# Monitors the tty port using minicom (/dev/ttyACM0)
+nimble monitor
+
+# Runs CMake configure without Nimble.
+piconim configure [--project <project-name>] [--source <source-dir>] [--sdk <sdk-path>]
+  [--board <pico-board>]
+
+# Build a program without Nimble.
+piconim build [--project <project-name>] [--target <target>] [--compileOnly] [--upload] <program>
+
 ```
+
 
 ## Contributing
 

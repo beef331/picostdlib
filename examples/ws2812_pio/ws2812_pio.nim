@@ -26,9 +26,9 @@ let ws2812Pio = pio0
 proc ws2812_program_get_default_config(offset: uint): PioSmConfig {.importc.}
 
 let
-  ws2812_T1 {.importc.}: int 
-  ws2812_T2 {.importc.}: int 
-  ws2812_T3 {.importc.}: int 
+  ws2812_T1 {.importc.}: int
+  ws2812_T2 {.importc.}: int
+  ws2812_T3 {.importc.}: int
 
   ws2812_program* {.importc.}: PioProgram
 {.pop.}
@@ -44,9 +44,9 @@ proc initWs2812*(
   cfg.setFifoJoin PioFifoJoin.tx
 
   when isRgbw:
-    cfg.setOutShift(shiftRight=false, autopull=true, pullThreshold=32)
+    cfg.setOutShift(shiftRight = false, autopull = true, pullThreshold = 32)
   else:
-    cfg.setOutShift(shiftRight=false, autopull=true, pullThreshold=24)
+    cfg.setOutShift(shiftRight = false, autopull = true, pullThreshold = 24)
 
   const ws2812Freq = 800_000 # ws2812 data bitrate in bits/s
   let

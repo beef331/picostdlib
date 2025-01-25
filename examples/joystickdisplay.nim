@@ -1,14 +1,15 @@
 import picostdlib
-import picostdlib/[adc, gpio]
+import picostdlib/hardware/adc
 
 stdioInitAll()
 adcInit()
-Adc26.Gpio.init()
-Adc27.Gpio.init()
+Gpio(26).init()
+Gpio(27).init()
+
 while true:
-  Adc26.selectInput
+  Adc26.selectInput()
   let xRaw = adcRead()
-  Adc27.selectInput
+  Adc27.selectInput()
   let yRaw = adcRead()
   const
     width = 40u16
@@ -34,5 +35,4 @@ while true:
       print(" ")
   print "] \n"
 
-  sleep(50)
-
+  sleepMs(50)

@@ -1,0 +1,3 @@
+[submodule "src/picostdlib/vendor/pico-vfs"]
+	path = src/picostdlib/vendor/pico-vfs
+	url = https://github.com/daniel-j/pico-vfs.git

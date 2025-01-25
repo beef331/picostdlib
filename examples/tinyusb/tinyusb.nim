@@ -42,18 +42,18 @@ proc sendHidReport(id: HidReportId) =
   of HidReportId.mouse:
     if btn:
       # Move mouse down and right
-      discard hid.sendMouseReport(id.uint8, buttons={}, x=5, y=5, horizontal=0, vertical=0)
+      discard hid.sendMouseReport(id.uint8, buttons = {}, x = 5, y = 5, horizontal = 0, vertical = 0)
     else:
       # Empty mouse report. Does nothing except continue the callback chain
       # for the gamepad report.
-      discard hid.sendMouseReport(id.uint8, buttons={}, x=0, y=0, horizontal=0, vertical=0)
+      discard hid.sendMouseReport(id.uint8, buttons = {}, x = 0, y = 0, horizontal = 0, vertical = 0)
   of HidReportId.gamepad:
     if btn:
       discard hid.sendGamepadReport(
         id.uint8,
-        x=0, y=0, z=0, rz=0, rx=0, ry=0,
-        hat=GamepadHatPosition.centered,
-        buttons={GamepadButton.b8}
+        x = 0, y = 0, z = 0, rz = 0, rx = 0, ry = 0,
+        hat = GamepadHatPosition.centered,
+        buttons = {GamepadButton.b8}
       )
       hasGpPress = true
     else:
@@ -61,9 +61,9 @@ proc sendHidReport(id: HidReportId) =
         # Need to send an empty report to tell host that key isn't pressed anymore
         discard hid.sendGamepadReport(
           id.uint8,
-          x=0, y=0, z=0, rz=0, rx=0, ry=0,
-          hat=GamepadHatPosition.centered,
-          buttons={}
+          x = 0, y = 0, z = 0, rz = 0, rx = 0, ry = 0,
+          hat = GamepadHatPosition.centered,
+          buttons = {}
         )
         hasGpPress = false
 
@@ -126,7 +126,7 @@ proc setup() =
 
   DefaultLedPin.init()
   DefaultLedPin.setDir(Out)
-  
+
   # TinyUSB initialization
   discard usbInit()
   boardInit()

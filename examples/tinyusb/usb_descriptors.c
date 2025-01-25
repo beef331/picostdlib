@@ -1,9 +1,9 @@
-/* 
+/*
  * The MIT License (MIT)
  *
  * Original TinyUSB example:
  * Copyright (c) 2019 Ha Thach (tinyusb.org)
- * 
+ *
  * Modifications for picostdlib example:
  * Copyright (c) 2022 Francis Therien
  *
@@ -91,8 +91,8 @@ uint8_t const desc_fs_configuration[] =
 // Invoked when received GET CONFIGURATION DESCRIPTOR
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
-// 
-// RP2040 note: only support full-speed, so we don't need to define 
+//
+// RP2040 note: only support full-speed, so we don't need to define
 // high-speed configuration.
 uint8_t const * tud_descriptor_configuration_cb(uint8_t index)
 {
